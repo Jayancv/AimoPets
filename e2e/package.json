@@ -1,0 +1,18 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "End to end testing",
+  "main": "index.js",
+  "scripts": {   
+    "test": "playwright test --project=chromium",
+    "test:report": "playwright show-report",
+    "test:ui": "playwright test --ui --reporter=list --config=playwright.config.ts",
+    "test:debug": "playwright test --debug --config=playwright.config.ts"
+  },
+  "author": "Jayan Vidanapathirana",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.1"
+  }
+}
