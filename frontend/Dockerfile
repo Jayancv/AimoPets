@@ -1,8 +1,5 @@
 # Build stage
-FROM node:20  AS build
-
-ARG VITE_BACKEND_URL
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+FROM node:20-bullseye  AS build
 
 WORKDIR /usr/src/app
 
