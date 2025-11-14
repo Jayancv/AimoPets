@@ -110,8 +110,7 @@ jobs:
 
       - name: Run frontend unit tests
         working-directory: frontend
-        # Ensure you have a script for CI tests, e.g. "test:ci": "vitest --run" or use your test runner.
-        run: npm run test:ci --if-present || npm test --if-present -- --watchAll=false
+        run: npm run test:ci
 
   backend-tests:
     name: Backend Unit Tests
