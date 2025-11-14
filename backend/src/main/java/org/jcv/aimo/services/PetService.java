@@ -17,17 +17,14 @@ import java.util.concurrent.*;
 public class PetService
 {
     public static final String USER_URL = "https://randomuser.me/api/";
-
     public static final String DOG_URL = "https://dog.ceo/api/breeds/image/random/";
 
     private static final Logger logger = LoggerFactory.getLogger(PetService.class);
 
     private final WebClient userClient;
-
     private final WebClient dogClient;
 
     private final String USER_BASE_URL;
-
     private final String DOG_BASE_URL;
 
     public
