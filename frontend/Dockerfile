@@ -1,9 +1,6 @@
 # Build stage
 FROM node:20  AS build
 
-ARG VITE_BACKEND_URL
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
-
 WORKDIR /usr/src/app
 
 COPY package.json ./

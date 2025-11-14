@@ -13,6 +13,12 @@ export default defineConfig({
     //     changeOrigin: true,
     //   },
     // },
+  },
+  optimizeDeps: {
+    exclude: ['rollup'],
+    },
+  ssr: {
+    noExternal: ['rollup'],
   }
 
 })
