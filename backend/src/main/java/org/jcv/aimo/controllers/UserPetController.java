@@ -17,33 +17,37 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
-public class PetController {
-
-    private static final Logger logger = LoggerFactory.getLogger(PetController.class);
+public class UserPetController
+{
+    private static final Logger logger = LoggerFactory.getLogger(UserPetController.class);
 
     private final PetService service;
+
     private final ModelToDtoMapper mapper;
 
-    public PetController(PetService service, ModelToDtoMapper mapper) {
+    public UserPetController(PetService service, ModelToDtoMapper mapper)
+    {
         this.service = service;
         this.mapper = mapper;
     }
 
-    @GetMapping(path = "/users-with-pet", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/users-with-pet")
     public ResponseEntity<?> getUsersWithPet(
-            @RequestParam(defaultValue = "10") int results,
-            @RequestParam(required = false) String nat
-    ) {
+        @RequestParam(defaultValue = "10") int results,
+        @RequestParam(required = false) String nat
+    )
+    {
         try {
             List<User> users = service.fetchUsersWithPets(results, nat);
-            List<UserWithPetDTO> userDtos= users.stream().map(mapper::toDTO).toList();
+            List<UserWithPetDTO> userDtos = users.stream().map(mapper::toDTO).toList();
             return ResponseEntity.ok(userDtos);
         } catch (Exception e) {
-            logger.error("Error while fetching results.", e);
+            String msg = e.getMessage();    // "Exception : some custom message"
+            logger.error("Error while fetching results. {}", msg);
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
+            String customErrorMsg = msg.substring(msg.indexOf(":") + 1).trim();
+            errorResponse.put("error", customErrorMsg);
             return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
-
 }

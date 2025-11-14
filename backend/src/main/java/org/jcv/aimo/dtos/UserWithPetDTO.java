@@ -7,5 +7,6 @@ public record UserWithPetDTO(String id,
                              String email,
                              String gender,
                              String country,
-                             String petImage) {
+                             String petImage)
+{
 }

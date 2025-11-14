@@ -6,18 +6,24 @@ import org.jcv.aimo.models.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ModelToDtoMapper {
-
-    public UserWithPetDTO toDTO(User user) {
+public class ModelToDtoMapper
+{
+    /**
+     * Mapping User model to user Dto
+     * @param user
+     * @return UserWithPetDTO
+     */
+    public UserWithPetDTO toDTO(User user)
+    {
         return new UserWithPetDTO(
-                user.getId(),
-                user.getFuLLName(),
-                new DobDTO(user.getDob().getDate(), user.getDob().getAge()),
-                user.getPhone(),
-                user.getEmail(),
-                user.getGender(),
-                user.getCountry(),
-                user.getPetImage()
+            user.getId(),
+            user.getFuLLName(),
+            new DobDTO(user.getDob().getDate(), user.getDob().getAge()),
+            user.getPhone(),
+            user.getEmail(),
+            user.getGender(),
+            user.getCountry(),
+            user.getPetImage()
         );
     }
 }

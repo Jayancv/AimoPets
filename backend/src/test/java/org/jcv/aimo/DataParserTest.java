@@ -11,9 +11,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DataParserTest {
+public class DataParserTest
+{
     @Test
-    void testMapToUser_withValidData() {
+    void testMapToUser_withValidData()
+    {
         Map<String, Object> idMap = Map.of("value", "123ABC");
         Map<String, Object> nameMap = Map.of("first", "John", "last", "Doe");
         Map<String, Object> dobMap = Map.of("date", "1990-01-01T00:00:00Z", "age", 34);
@@ -44,7 +46,8 @@ public class DataParserTest {
     }
 
     @Test
-    void testMapToUser_missingIdGeneratesUUID() {
+    void testMapToUser_missingIdGeneratesUUID()
+    {
         Map<String, Object> nameMap = Map.of("first", "Jane", "last", "Smith");
         Map<String, Object> input = new HashMap<>();
         input.put("name", nameMap);
@@ -58,7 +61,8 @@ public class DataParserTest {
     }
 
     @Test
-    void testMapToUser_handlesAgeAsDouble() {
+    void testMapToUser_handlesAgeAsDouble()
+    {
         Map<String, Object> dobMap = new HashMap<>();
         dobMap.put("date", "1980-05-10T00:00:00Z");
         dobMap.put("age", 42.0); // API might return double instead of int
@@ -72,7 +76,8 @@ public class DataParserTest {
     }
 
     @Test
-    void testMapToUser_handlesMissingFieldsSafely() {
+    void testMapToUser_handlesMissingFieldsSafely()
+    {
         // Completely empty input map
         User result = DataParser.mapToUser(new HashMap<>());
 
@@ -89,13 +94,14 @@ public class DataParserTest {
     }
 
     @Test
-    void testMapToUser_logsErrorForInvalidAgeType() {
+    void testMapToUser_logsErrorForInvalidAgeType()
+    {
         // This tests that the logger error path is triggered for wrong type
         Map<String, Object> dobMap = Map.of("date", "2000-01-01T00:00:00Z", "age", "invalid-type");
 
         Map<String, Object> input = Map.of(
-                "name", Map.of("first", "Bob", "last", "Builder"),
-                "dob", dobMap
+            "name", Map.of("first", "Bob", "last", "Builder"),
+            "dob", dobMap
         );
 
         // We can’t easily assert logs without using a framework like LogCaptor,

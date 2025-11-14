@@ -9,7 +9,8 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User
+{
     private String id;
     private String fullName;
     private String firstName;
@@ -21,8 +22,8 @@ public class User {
     private String country;
     private String petImage;
 
-    public String getFuLLName() {
+    public String getFuLLName()
+    {
         return firstName + " " + lastName;
     }
-
 }

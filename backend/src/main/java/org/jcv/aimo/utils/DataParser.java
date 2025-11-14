@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.UUID;
 
-public class DataParser {
-
+public class DataParser
+{
     private static final Logger logger = LoggerFactory.getLogger(DataParser.class);
 
-
-    public static User mapToUser(Map<String, Object> u) {
+    public static User mapToUser(Map<String, Object> u)
+    {
         // Extract nested fields safely
         Map<String, Object> idObj = (Map<String, Object>) u.getOrDefault("id", Map.of());
         Map<String, Object> nameObj = (Map<String, Object>) u.getOrDefault("name", Map.of());
@@ -55,5 +55,4 @@ public class DataParser {
 
         return user;
     }
-
 }
