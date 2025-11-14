@@ -111,6 +111,7 @@ public class PetService
      */
     private List<User> loadUsersParallel(int count, String nationalities)
     {
+        // TODO increase the WebClient buffer size to handle larger responses
 
         final int MAX_PER_REQUEST = 200;   // RandomUser API recommended batch size
         List<Integer> batchSizes = new ArrayList<>();

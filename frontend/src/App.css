@@ -40,4 +40,24 @@
 .read-the-docs {
   color: #888;
 } */
+
+.app-container {
+  min-height: 100vh; /* min-h-screen */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  padding: 1.5rem; /* p-6 */
+}
+
+.app-title {
+  text-align: center; /* text-center */
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.app-subtitle {
+  text-align: center;
+  color: #4b5563; /* text-gray-600 */
+  margin-bottom: 1.5rem; /* mb-6 */
+}
+
 @import "tailwindcss";
