@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.UriBuilder;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -268,11 +266,6 @@ public class PetService
      */
     private List<String> loadDogs(int count)
     {
-
-        UriBuilder uriBuilder = new DefaultUriBuilderFactory(DOG_BASE_URL).builder();
-        uriBuilder.path(String.valueOf(count));
-        String finalUrl = uriBuilder.toUriString();
-
         Map<String, Object> dogResponse = null;
         try {
             dogResponse =
