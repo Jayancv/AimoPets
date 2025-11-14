@@ -38,18 +38,20 @@ const UserBoard = ({ users, loading, error,  itemsPerPage = 25  }: UserBoardProp
   }
 
   if (users.length === 0) {
-    return <p className="text-center text-gray-400">No users found. Try fetching!</p>;
+    return (
+      <p className="text-center text-gray-400">No users found. Try fetching!</p>
+    );
   }
 
   return (
-    <div >
+    <div>
       <div className="flex flex-wrap justify-center gap-6">
-      {currentUsers.map((user) => (
-        <UserCard key={user.id} user={user} />
-      ))}
-    </div>
+        {currentUsers.map((user) => (
+          <UserCard key={user.id} user={user} />
+        ))}
+      </div>
 
-     {/* Pagination controls */}
+      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-4 mt-4">
           <button
