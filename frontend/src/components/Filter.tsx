@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CountryDropdown from "./CountryDropdown";
+import "./Filter.css";
 
 interface FilterProps {
   onFilter: (count: number, nat: string) => void;
@@ -15,28 +16,21 @@ const UserFilter = ({ onFilter }: FilterProps) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row gap-3 mb-6 items-center justify-center"
-    >
+    <form onSubmit={handleSubmit} className="user-filter-form">
       <input
         name="count"
         type="number"
         value={count}
         onChange={(e) => setCount(Number(e.target.value))}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-32"
+        className="user-filter-input"
         placeholder="Count"
         min={1}
-        max={1000}
+        max={2500}
       />
       {/* Country dropdown */}
       <CountryDropdown selectedCountry={nat} onCountryChange={setNat} />
 
-      <button
-       name="fetch"
-        type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
-      >
+      <button name="fetch" type="submit" className="user-filter-button">
         Fetch Data
       </button>
     </form>

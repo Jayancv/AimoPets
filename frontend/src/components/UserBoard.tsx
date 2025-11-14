@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import UserCard from "./UserCard";
 import type { User } from "../models/User";
+import "./UserBoard.css";
 
 interface UserBoardProps {
   users: User[];
@@ -26,26 +27,28 @@ const UserBoard = ({ users, loading, error,  itemsPerPage = 25  }: UserBoardProp
   };
 
   useEffect(() => {
+    console.log("User data changed, reset to 1st page");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setCurrentPage(1);
   }, [users]);
 
   if (loading) {
-    return <p className="text-center text-gray-500">Loading...</p>;
+    return <p className="user-board-message">Loading...</p>;
   }
 
   if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
+    return <p className="user-board-error">{error}</p>;
   }
 
   if (users.length === 0) {
     return (
-      <p className="text-center text-gray-400">No users found. Try fetching!</p>
+      <p className="user-board-empty">No users found. Try fetching!</p>
     );
   }
 
   return (
     <div>
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className="user-board-grid">
         {currentUsers.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
@@ -53,12 +56,12 @@ const UserBoard = ({ users, loading, error,  itemsPerPage = 25  }: UserBoardProp
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-4 mt-4">
+        <div  className="user-board-pagination">
           <button
             name="previous"
             onClick={handlePrev}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            className="user-board-button"
           >
             Previous
           </button>
@@ -71,7 +74,7 @@ const UserBoard = ({ users, loading, error,  itemsPerPage = 25  }: UserBoardProp
             name="next"
             onClick={handleNext}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            className="user-board-button"
           >
             Next
           </button>
