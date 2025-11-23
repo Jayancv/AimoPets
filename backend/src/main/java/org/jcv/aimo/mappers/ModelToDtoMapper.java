@@ -17,7 +17,7 @@ public class ModelToDtoMapper
     {
         return new UserWithPetDTO(
             user.getId(),
-            user.getFuLLName(),
+            user.getFullName(),
             new DobDTO(user.getDob().getDate(), user.getDob().getAge()),
             user.getPhone(),
             user.getEmail(),
