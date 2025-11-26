@@ -24,21 +24,21 @@ vi.mock("./CountryDropdown", () => ({
 
 describe("Filter Component", () => {
   it("renders inputs and button", () => {
-    render(<UserFilter onFilter={vi.fn()} />);
+    render(<UserFilter onFilter={vi.fn()} loading={false} />);
     expect(screen.getByPlaceholderText(/count/i)).toBeInTheDocument();
     expect(screen.getByTestId("country-dropdown")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /fetch data/i })).toBeInTheDocument();
   });
 
   it("updates count input", () => {
-    render(<UserFilter onFilter={vi.fn()} />);
+    render(<UserFilter onFilter={vi.fn()} loading={false} />);
     const input = screen.getByPlaceholderText(/count/i) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "10" } });
     expect(input.value).toBe("10");
   });
 
   it("updates country dropdown", () => {
-    render(<UserFilter onFilter={vi.fn()} />);
+    render(<UserFilter onFilter={vi.fn()} loading={false} />);
     const dropdown = screen.getByTestId("country-dropdown") as HTMLSelectElement;
     fireEvent.change(dropdown, { target: { value: "US" } });
     expect(dropdown.value).toBe("US");
@@ -46,7 +46,7 @@ describe("Filter Component", () => {
 
   it("calls onFilter with correct values on submit", () => {
     const onFilterMock = vi.fn();
-    render(<UserFilter onFilter={onFilterMock} />);
+    render(<UserFilter onFilter={onFilterMock} loading={false} />);
 
     const input = screen.getByPlaceholderText(/count/i) as HTMLInputElement;
     const dropdown = screen.getByTestId("country-dropdown") as HTMLSelectElement;

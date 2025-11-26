@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import UserCard from "./UserCard";
 import type { User } from "../models/User";
 import "./UserBoard.css";
@@ -15,8 +15,10 @@ const UserBoard = ({ users, loading, error,  itemsPerPage = 25  }: UserBoardProp
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(users.length / itemsPerPage);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentUsers = users.slice(startIndex, startIndex + itemsPerPage);
+  const currentUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return users.slice(startIndex, startIndex + itemsPerPage);
+  }, [users, currentPage, itemsPerPage]);
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
