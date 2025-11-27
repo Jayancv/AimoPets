@@ -1,3 +1,4 @@
+import React from "react";
 
 interface CountryDropDownProps {
   selectedCountry: string;
@@ -47,4 +48,4 @@ const CountryDropdown= ({ selectedCountry, onCountryChange }: CountryDropDownPro
   );
 };
 
-export default CountryDropdown;
+export default React.memo(CountryDropdown);

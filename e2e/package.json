@@ -4,7 +4,7 @@
   "description": "End to end testing",
   "main": "index.js",
   "scripts": {   
-    "test": "playwright test --project=chromium",
+    "test": "playwright test",
     "test:report": "playwright show-report",
     "test:ui": "playwright test --ui --reporter=list --config=playwright.config.ts",
     "test:debug": "playwright test --debug --config=playwright.config.ts"

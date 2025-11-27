@@ -4,9 +4,10 @@ import "./Filter.css";
 
 interface FilterProps {
   onFilter: (count: number, nat: string) => void;
+  loading: boolean;
 }
 
-const UserFilter = ({ onFilter }: FilterProps) => {
+const UserFilter = ({ onFilter, loading }: FilterProps) => {
   const [count, setCount] = useState<number>(5);
   const [nat, setNat] = useState<string>("");
 
@@ -25,16 +26,16 @@ const UserFilter = ({ onFilter }: FilterProps) => {
         className="user-filter-input"
         placeholder="Count"
         min={1}
-        max={2500}
+        max={20000}
       />
       {/* Country dropdown */}
       <CountryDropdown selectedCountry={nat} onCountryChange={setNat} />
 
-      <button name="fetch" type="submit" className="user-filter-button">
+      <button name="fetch" type="submit"  disabled={loading} className="user-filter-button">
         Fetch Data
       </button>
     </form>
   );
 };
 
-export default UserFilter;
+export default React.memo(UserFilter);
