@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
@@ -19,19 +20,26 @@ public class PetService
 
     private static final Logger logger = LoggerFactory.getLogger(PetService.class);
 
+    public static final int SEQUENTIAL_LIMIT = 50;
+    public static final int MAX_PER_DOG_REQUEST = 50;
+
+    public static final int MAX_PER_USER_REQUEST = 5000;
+    public static final int USER_API_BUFFER_SIZE = 7 * 1024 * 1024;
+
     private final WebClient userClient;
     private final WebClient dogClient;
 
     private final String USER_BASE_URL;
     private final String DOG_BASE_URL;
 
+    @Autowired
+    ExecutorService executor;
+
     public
-    @Autowired PetService(WebClient.Builder webClientBuilder)
+    @Autowired
+    PetService(WebClient.Builder webClientBuilder)
     {
-        USER_BASE_URL = USER_URL;
-        DOG_BASE_URL = DOG_URL;
-        this.userClient = webClientBuilder.baseUrl(USER_BASE_URL).build();
-        this.dogClient = webClientBuilder.baseUrl(DOG_BASE_URL).build();
+        this(webClientBuilder, USER_URL, DOG_URL);
     }
 
     /**
@@ -45,7 +53,9 @@ public class PetService
     {
         USER_BASE_URL = user_url;
         DOG_BASE_URL = dog_url;
-        this.userClient = webClientBuilder.baseUrl(USER_BASE_URL).build();
+        this.userClient = webClientBuilder.baseUrl(USER_BASE_URL).exchangeStrategies(ExchangeStrategies.builder().
+                codecs(c -> c.defaultCodecs().maxInMemorySize(USER_API_BUFFER_SIZE)).build()).
+            build();
         this.dogClient = webClientBuilder.baseUrl(DOG_BASE_URL).build();
     }
 
@@ -59,23 +69,19 @@ public class PetService
     public List<User> fetchUsersWithPets(int count, String nationalities)
     {
 
-        boolean PARALLEL = count > 50;  // if result count higher than 50 then need to load dogs and users parallel
+        if (count < 1) {
+            return new ArrayList<>();
+        }
+        // if result count higher than 50 then need to load dogs and users parallel
+        boolean PARALLEL =  count > SEQUENTIAL_LIMIT;
         List<User> userResults = null;
         List<String> dogImages = null;
         if (PARALLEL) {
             // Run both API calls in parallel
-            CompletableFuture<List<User>> usersFuture =
-                CompletableFuture.supplyAsync(() -> loadUsersParallel(count, nationalities));
-            CompletableFuture<List<String>> dogsFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return loadDogsParallel(count);
-                } catch (ExecutionException | InterruptedException e) {
-                    String msg = getErrorMsg(e);
-                    msg = "Error in loading dogs. " + msg;
-                    logger.error(msg, e);
-                    throw new RuntimeException(msg, e);
-                }
-            });
+            CompletableFuture<List<User>> usersFuture = CompletableFuture.supplyAsync(() ->
+                loadUsersParallel(count, nationalities, executor));
+            CompletableFuture<List<String>> dogsFuture =
+                CompletableFuture.supplyAsync(() -> loadDogsParallel(count, executor));
 
             // Wait for both to complete
             CompletableFuture.allOf(usersFuture, dogsFuture).join();
@@ -103,15 +109,16 @@ public class PetService
 
     /**
      * Load users parallel if the count is higher than 200
+     *
      * @param count
      * @param nationalities
      * @return
      */
-    private List<User> loadUsersParallel(int count, String nationalities)
+    private List<User> loadUsersParallel(int count, String nationalities, ExecutorService executor)
     {
         // TODO increase the WebClient buffer size to handle larger responses
 
-        final int MAX_PER_REQUEST = 200;   // RandomUser API recommended batch size
+        final int MAX_PER_REQUEST = MAX_PER_USER_REQUEST;   // RandomUser API recommended batch size
         List<Integer> batchSizes = new ArrayList<>();
 
         // ---- Split into batches ----
@@ -126,21 +133,20 @@ public class PetService
         }
 
         // ---- Parallel execution ----
-        ExecutorService pool = Executors.newFixedThreadPool(batchSizes.size());
         List<Future<List<User>>> futures = new ArrayList<>();
 
         for (Integer batchSize : batchSizes) {
-            futures.add(pool.submit(() -> {
+            futures.add(executor.submit(() -> {
 
                 // --- Build user API request ---
                 Map<String, Object> response = userClient.get()
-                        .uri(uri -> uri
-                            .queryParam("results", batchSize)
-                            .queryParam("nat", nationalities)
-                            .build())
-                        .retrieve()
-                        .bodyToMono(Map.class)
-                        .block();
+                    .uri(uri -> uri
+                        .queryParam("results", batchSize)
+                        .queryParam("nat", nationalities)
+                        .build())
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
 
                 // --- Convert API results to User objects ---
                 List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
@@ -163,8 +169,6 @@ public class PetService
             msg = "Error in parallel loading users. " + msg;
             logger.error(msg, e);
             throw new RuntimeException(msg, e);
-        } finally {
-            pool.shutdown();
         }
 
         return allUsers;
@@ -210,10 +214,10 @@ public class PetService
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    private List<String> loadDogsParallel(int count) throws ExecutionException, InterruptedException
+    private List<String> loadDogsParallel(int count, ExecutorService executor)
     {
 
-        final int MAX_PER_REQUEST = 50;
+        final int MAX_PER_REQUEST = MAX_PER_DOG_REQUEST;
         int fullBatches = count / MAX_PER_REQUEST;
         int remainder = count % MAX_PER_REQUEST;
 
@@ -224,9 +228,6 @@ public class PetService
         if (remainder > 0) {
             batchSizes.add(remainder);
         }
-
-        // ExecutorService with fixed thread pool
-        ExecutorService executor = Executors.newFixedThreadPool(batchSizes.size());
 
         List<Future<List<String>>> futures = new ArrayList<>();
 
@@ -252,8 +253,6 @@ public class PetService
             }
         } catch (Exception e) {
             throw new RuntimeException("Error merging dog batches", e);
-        } finally {
-            executor.shutdown();
         }
         return allDogs;
     }
@@ -294,7 +293,11 @@ public class PetService
      */
     private static List<User> combineUserAndPet(List<User> userResults, List<String> dogImages)
     {
-        for (int i = 0; i < userResults.size(); i++) {
+        if (userResults.size() != dogImages.size()) {
+            logger.warn("Mismatch found between result counts.");
+        }
+        int min = Math.min(userResults.size(), dogImages.size());
+        for (int i = 0; i < min; i++) {
             User user = userResults.get(i);
             user.setPetImage(dogImages.get(i));
         }
